@@ -10,6 +10,8 @@
 const ORIGIN = 'https://brand-service-page.vercel.app'
 const LIVE = 'https://www.highlightschicago.com'
 const BRANDS_SITEMAP = `${LIVE}/brands/sitemap.xml`
+// The quote forms' endpoint (hero and footer forms), which passes each lead to Zapier.
+const LEAD_PATH = '/brands/api/lead'
 
 export default {
   async fetch(request) {
@@ -20,9 +22,10 @@ export default {
     // The route "/brands*" also matches paths like /brandsxyz; those belong to the main site.
     if (!(url.pathname === '/brands' || url.pathname.startsWith('/brands/'))) return fetch(request)
 
-    // The Studio and the API routes stay on the Vercel address only.
+    // The Studio and the API routes stay on the Vercel address only, except the quote form endpoint,
+    // which the pages on www post their forms to.
     if (/^\/brands\/studio(\/|$)/.test(url.pathname)) return Response.redirect(`${ORIGIN}${url.pathname}${url.search}`, 302)
-    if (/^\/brands\/api(\/|$)/.test(url.pathname)) return new Response('Not found', {status: 404})
+    if (/^\/brands\/api(\/|$)/.test(url.pathname) && url.pathname !== LEAD_PATH) return new Response('Not found', {status: 404})
 
     const headers = new Headers(request.headers)
     headers.set('x-hc-proxy', 'brands')

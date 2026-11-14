@@ -209,18 +209,24 @@ function Hero({doc, brandHref}: {doc: Doc; brandHref: string}) {
             </div>
           )}
         </div>
-        <form id="quote" className="bp-form" aria-labelledby="bp-form-title" data-preview-form>
+        {/* Sent to /brands/api/lead, which passes it to Zapier. site.js sends it without leaving the page;
+            before that script loads, the plain form post below still works. */}
+        <form id="quote" className="bp-form" aria-labelledby="bp-form-title" method="post" action="/brands/api/lead" data-lead-form>
           <h2 id="bp-form-title" className="bp-form-title">{f.title || 'Request a free'} <span className="bp-green">{f.titleHighlight || 'estimate'}</span></h2>
           {f.intro && <p className="bp-form-intro">{f.intro}</p>}
+          <input type="hidden" name="brand" value={doc.brand || ''} />
+          <input type="hidden" name="service" value={doc.service || doc.title || ''} />
+          <input type="hidden" name="formName" value="Brand page quote form" />
+          <label className="bp-trap" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
           <div className="bp-form-row">
-            <label><span>{f.nameLabel || 'Name'}</span><input name="name" autoComplete="name" placeholder={f.namePlaceholder || 'Your name'} /></label>
-            <label><span>{f.phoneLabel || 'Phone number'}</span><input name="phone" type="tel" autoComplete="tel" placeholder={f.phonePlaceholder || 'Your phone number'} /></label>
+            <label><span>{f.nameLabel || 'Name'}</span><input name="name" autoComplete="name" required placeholder={f.namePlaceholder || 'Your name'} /></label>
+            <label><span>{f.phoneLabel || 'Phone number'}</span><input name="phone" type="tel" autoComplete="tel" required minLength={7} placeholder={f.phonePlaceholder || 'Your phone number'} /></label>
           </div>
           <label><span>{f.addressLabel || 'Street or cross streets'}</span><input name="address" autoComplete="street-address" placeholder={f.addressPlaceholder || ''} /></label>
           {has(f.needOptions) && (
             <label>
               <span>{f.needLabel || 'What do you need?'}</span>
-              <select name="need" defaultValue={f.needDefault}>
+              <select name="issue" defaultValue={f.needDefault}>
                 {f.needOptions.map((o: string) => <option key={o}>{o}</option>)}
               </select>
             </label>
@@ -229,11 +235,12 @@ function Hero({doc, brandHref}: {doc: Doc; brandHref: string}) {
             <fieldset className="bp-form-chips">
               <legend>{f.modelQuestion}</legend>
               {f.modelChoices.map((c: string, i: number) => (
-                <label key={c} className="bp-chip-option"><input type="radio" name="model" value={c} defaultChecked={i === 0} /><span>{c}</span></label>
+                <label key={c} className="bp-chip-option"><input type="radio" name="existingSystem" value={c} defaultChecked={i === 0} /><span>{c}</span></label>
               ))}
             </fieldset>
           )}
           <button type="submit" className="bp-btn bp-btn--green bp-btn--block">{f.submitLabel || 'Request service'}<Icon name="arrow" size={18} /></button>
+          <p className="bp-form-error" role="alert" hidden>Sorry, your request did not send. Please call <a href={TEL}>{SITE.phone}</a>.</p>
           <p className="bp-form-call">{f.callLabel || 'Or call'} <a href={TEL}>{f.phone || SITE.phoneShort}</a></p>
         </form>
       </div>

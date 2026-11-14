@@ -102,6 +102,12 @@
 .bp-chip-option span{padding:7px 12px;border:1px solid #FFFFFF33;border-radius:999px;font:500 13px/18px var(--body);color:var(--on-navy-soft)}
 .bp-chip-option input:checked+span{border-color:var(--green);background:#66B1432B;color:#fff}
 .bp-chip-option input:focus-visible+span{outline:2px solid var(--green);outline-offset:2px}
+/* Quote forms: the hidden spam trap, the "please call" line on a failed send, the busy button */
+.bp-trap{position:absolute!important;left:-10000px;width:1px;height:1px;overflow:hidden}
+.bp-form-error{margin:0;padding:10px 12px;border-radius:8px;background:#FDECEC;color:#8A1F1F;font:500 14px/20px var(--body)}
+.bp-form-error a{color:inherit;font-weight:700;text-decoration:underline}
+.bp-form-error[hidden]{display:none}
+form[aria-busy=true] button[type=submit]{opacity:.6;cursor:progress}
 .bp-form-call{text-align:center;font-weight:600;color:#fff}
 .bp-form-call a{text-decoration:underline 1px var(--green);text-underline-offset:4px}
 
