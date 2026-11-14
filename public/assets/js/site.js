@@ -128,8 +128,39 @@
   // v2 price table: "See all" on phones
   $$('[data-more]').forEach((btn) => btn.addEventListener('click', () => btn.closest('.v2-table').classList.add('is-open')));
 
-  // Forms never submit in the preview.
-  $$('form').forEach((f) => f.addEventListener('submit', (e) => {
+  // Quote forms (hero and footer): sent to /brands/api/lead, which passes them to Zapier.
+  // On success the visitor goes to the thank-you page (a full page load, so conversion tracking fires);
+  // on failure the form shows its "please call" line and can be sent again.
+  const THANK_YOU = 'https://www.highlightschicago.com/services/thank-you';
+  $$('form[data-lead-form]').forEach((f) => {
+    const button = f.querySelector('button[type="submit"]');
+    const error = f.querySelector('.bp-form-error');
+    const reset = () => { f.removeAttribute('aria-busy'); if (button) button.disabled = false; };
+    // Coming back with Back can restore this page with the button still disabled.
+    window.addEventListener('pageshow', (e) => { if (e.persisted) reset(); });
+    f.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (f.getAttribute('aria-busy') === 'true') return;
+      const data = Object.fromEntries(new FormData(f).entries());
+      // The footer form has no brand fields of its own: take them from the page's hero form.
+      for (const key of ['brand', 'service']) {
+        if (!data[key]) { const v = document.querySelector(`#quote [name="${key}"]`); if (v && v.value) data[key] = v.value; }
+      }
+      data.pageUrl = location.href;
+      f.setAttribute('aria-busy', 'true');
+      if (button) button.disabled = true;
+      if (error) error.hidden = true;
+      try {
+        const res = await fetch(f.getAttribute('action'), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data) });
+        if (res.ok) { location.assign(THANK_YOU); return; }
+      } catch { /* shown below */ }
+      if (error) error.hidden = false;
+      reset();
+    });
+  });
+
+  // Any other form is a design preview and never submits.
+  $$('form:not([data-lead-form])').forEach((f) => f.addEventListener('submit', (e) => {
     e.preventDefault();
     if (f.querySelector('.pv-form-msg')) return;
     const p = document.createElement('p');
