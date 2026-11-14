@@ -2,9 +2,13 @@ import type {Metadata} from 'next'
 import {draftMode} from 'next/headers'
 import Script from 'next/script'
 import {VisualEditing} from 'next-sanity/visual-editing'
+import {GoogleTagManager, GoogleTagManagerNoScript} from '@/components/google-tag-manager'
+import {SiteNavbar} from '@/components/site-navbar/site-navbar'
 import {siteUrl, isLive} from '@/sanity/env'
-import {siteHeader} from '@/lib/site-nav.mjs'
 import {hcFooter} from '@/lib/ui.mjs'
+// The shared site navbar's styles, imported last (the component itself does not import CSS, so the
+// copies in every app stay identical). Its font comes from --font-inter, set by inter.css on <body>.
+import '@/components/site-navbar/site-navbar.css'
 
 const BASE = '/brands/'
 // Changes with every deploy, so browsers never keep an old copy of the stylesheets and scripts.
@@ -18,29 +22,33 @@ export const metadata: Metadata = {
 }
 
 // Stylesheets from the Highlights Chicago Design System v3 build (the same files as the live /services pages),
-// plus the shared header and the brand page sections.
-const CSS = ['inter.css', 'ds.css', 'site.css', 'preview.css', 'site-nav.css', 'brand-page.css']
+// plus the brand page sections.
+const CSS = ['inter.css', 'ds.css', 'site.css', 'preview.css', 'brand-page.css']
 
 export default async function SiteLayout({children}: {children: React.ReactNode}) {
   const preview = (await draftMode()).isEnabled
+  // Google Tag Manager and GA4 fire only on the live site: not locally, not on preview deployments, not for
+  // editors previewing drafts. The Studio has its own layout, so it never gets them.
+  const gtm = process.env.VERCEL_ENV === 'production' && !preview
   return (
     <html lang="en">
       <head>
         {CSS.map((f) => <link key={f} rel="stylesheet" href={`${BASE}assets/css/${f}?v=${V}`} />)}
       </head>
       <body className="inter_c15e96cb-module__0bjUvq__variable">
+        {gtm && <GoogleTagManagerNoScript />}
         {preview && (
           <div className="bp-preview-bar" role="note">
             Preview: you are seeing drafts. <a href={`${BASE}api/draft-mode/disable`}>Leave preview</a>
           </div>
         )}
         <div className="collection-page">
-          <div dangerouslySetInnerHTML={{__html: siteHeader({logoSrc: `${BASE}images/v3/logos/highlights-chicago-logo.webp`, brandsHref: '/brands', current: 'brands'})}} />
+          <SiteNavbar current="brands" />
           <main id="main">{children}</main>
           <div dangerouslySetInnerHTML={{__html: hcFooter(BASE)}} />
         </div>
-        <Script src={`${BASE}assets/js/site-nav.js?v=${V}`} strategy="afterInteractive" />
         <Script src={`${BASE}assets/js/site.js?v=${V}`} strategy="afterInteractive" />
+        {gtm && <GoogleTagManager />}
         {preview && <VisualEditing />}
       </body>
     </html>

@@ -27,7 +27,8 @@ See `.env.example` (no `NEXT_PUBLIC_` names). Keep real values in `.env.local` (
 
 - `components/landing/BrandServicePage.tsx`: the landing page, section by section, following the Paper design "HC · Generac generator brand page". An empty field or section is left out.
 - `public/assets/css/brand-page.css`: its styles (Design System v3 tokens; phones from 1023px).
-- `lib/site-nav.mjs`, `lib/nav.mjs`: the site header (live nav + Brands; Services menu shows live pages only).
+- `components/site-navbar/`: the shared site navbar, a byte-for-byte copy of the folder in the Service-Pages repo (also in the service-areas and reviews apps, and the Webflow "Site Navbar" component). Change the menu in all of them together. Its CSS is imported by `app/(site)/layout.tsx`.
+- `components/google-tag-manager.tsx`: Google Tag Manager and GA4 (same IDs as Webflow), loaded only on the production deployment, never in draft preview or the Studio.
 - `lib/brands.mjs`, `lib/collections.mjs`: brand data from the sheet and the `/brands` and `/brands/<brand>` pages.
 - `sanity/`: client, queries, schema (copied from the Brand Service Pages studio; keep both in step), `sanity.config.ts` for the Studio.
 
