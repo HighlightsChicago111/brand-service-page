@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test:lead": "node scripts/test-lead.mjs"
+    "test:lead": "node scripts/test-lead.mjs",
+    "test:schema": "node scripts/test-structured-data.mjs"
   },
   "dependencies": {
     "@sanity/image-url": "^2.1.1",
