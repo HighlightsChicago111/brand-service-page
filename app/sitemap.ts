@@ -3,6 +3,10 @@ import {getPublishedPageList} from '@/lib/data'
 import {buildBrands, slugify} from '@/lib/brands.mjs'
 import {siteUrl} from '@/sanity/env'
 
+// The sitemap is a cached route. Publishing in Sanity refreshes it through /api/revalidate (revalidatePath);
+// this 10-minute limit is the fallback if a webhook call is ever missed.
+export const revalidate = 600
+
 // /brands/sitemap.xml: the brands page, every brand page and every published brand service page.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages = await getPublishedPageList()

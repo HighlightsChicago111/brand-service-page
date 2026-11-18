@@ -1,4 +1,4 @@
-import {revalidateTag} from 'next/cache'
+import {revalidatePath, revalidateTag} from 'next/cache'
 import {type NextRequest, NextResponse} from 'next/server'
 import {parseBody} from 'next-sanity/webhook'
 import {BRAND_TAG} from '@/sanity/client'
@@ -16,5 +16,7 @@ export async function POST(request: NextRequest) {
   if (body?._type !== BRAND_PAGE_TYPE) return NextResponse.json({message: 'Not a brand page'}, {status: 400})
   // One publish can change the listings (written pages sort first) as well as the page, so refresh them all.
   revalidateTag(BRAND_TAG, 'max')
+  // The sitemap route does not pick up the tag on its own, so it is refreshed by path as well.
+  revalidatePath('/sitemap.xml')
   return NextResponse.json({revalidated: true, slug: body.slug ?? null})
 }
