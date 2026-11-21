@@ -24,3 +24,8 @@ export async function sanityFetch<T>(query: string, params: QueryParams = {}): P
 export function publishedFetch<T>(query: string, params: QueryParams = {}): Promise<T> {
   return client.fetch<T>(query, params, {perspective: 'published', token: readToken, next: {tags: [BRAND_TAG], revalidate: 3600}})
 }
+
+/** Published content read fresh from Sanity on every call (no data cache), for the sitemap. */
+export function freshPublishedFetch<T>(query: string, params: QueryParams = {}): Promise<T> {
+  return client.fetch<T>(query, params, {perspective: 'published', token: readToken, cache: 'no-store'})
+}

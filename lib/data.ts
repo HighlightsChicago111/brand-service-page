@@ -1,5 +1,5 @@
 import 'server-only'
-import {publishedFetch, sanityFetch} from '@/sanity/client'
+import {freshPublishedFetch, publishedFetch, sanityFetch} from '@/sanity/client'
 import {PAGE_LIST_QUERY} from '@/sanity/queries'
 import {buildBrands} from './brands.mjs'
 
@@ -25,6 +25,16 @@ export async function getBrands() {
 export async function getPublishedPageList(): Promise<PageListItem[]> {
   try {
     return (await publishedFetch<PageListItem[]>(PAGE_LIST_QUERY)) || []
+  } catch (error) {
+    console.error('Published brand page list could not be loaded from Sanity', error)
+    return []
+  }
+}
+
+/** Published brand pages read fresh from Sanity, so the sitemap always matches what is live. */
+export async function getFreshPublishedPageList(): Promise<PageListItem[]> {
+  try {
+    return (await freshPublishedFetch<PageListItem[]>(PAGE_LIST_QUERY)) || []
   } catch (error) {
     console.error('Published brand page list could not be loaded from Sanity', error)
     return []
